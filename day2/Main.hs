@@ -20,7 +20,7 @@ inst  =  (string "forward" >> spaces >> Fwd <$> num)
      <|> (string "up" >> spaces >> Up <$> num)
 
 course :: Parser Course
-course = inst `sepEndBy` char '\n'
+course = inst `sepEndBy` endOfLine
 
 evalI :: Pos -> Inst -> Pos
 evalI (x, y) (Fwd z)  = (x + z, y)
