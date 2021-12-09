@@ -3,23 +3,18 @@ module Main where
 
 import Text.Parsec hiding (Line)
 import Text.Parsec.String (Parser, parseFromFile)
-import Data.List (nub)
 import qualified Data.Map.Strict as M
 
-data Edge a = Edge {from :: a, to :: a}
+data Edge a = Edge a a
   deriving (Eq, Show)
 
 type Point = (Int, Int)
 type Line = Edge Point
 
-num :: Parser Int
-num = read <$> many1 digit
-
-point :: Parser Point
-point = (,) <$> num <*> (char ',' >> num)
-
 line :: Parser Line
 line = Edge <$> point <*> (string " -> " >> point)
+  where point = (,) <$> num <*> (char ',' >> num)
+        num = read <$> many1 digit
 
 isHorV :: Line -> Bool
 isHorV (Edge (x1,y1) (x2,y2)) = x1 == x2 || y1 == y2
@@ -28,7 +23,7 @@ region :: (Ord a, Enum a) => a -> a -> [a]
 region x y | x <= y    = [x..y]
 region x y | otherwise = reverse [y..x]
 
--- like zip, but shorter lists gets padded with its last entry
+-- like zip, but shorter list gets padded with its last entry
 zip' :: [a] -> [b] -> [(a,b)]
 zip' []     []     = []
 zip' [x]    [y]    = [(x,y)]
@@ -44,28 +39,22 @@ lineToPts (Edge (x1,y1) (x2,y2)) = zip' (region x1 x2) (region y1 y2)
 data N2 = Zero | One | TwoOrMore
   deriving (Eq,Show)
 
-suc :: N2 -> N2
-suc Zero = One
-suc One  = TwoOrMore
-suc _    = TwoOrMore
-
 extCount :: [Point] -> M.Map Point N2
-extCount [] = M.empty
+extCount []     = M.empty
 extCount (p:ps) = M.insertWith (\_ _ -> TwoOrMore) p One (extCount ps)
 
-countCritOverlap :: [Point] -> Int
-countCritOverlap =
+countCritOverlaps :: [Point] -> Int
+countCritOverlaps =
   length . filter (==TwoOrMore) . M.elems . extCount
 
 main :: IO ()
 main = do
   Right ls <- parseFromFile (many (line <* endOfLine)) "input"
-  let hvls  = filter isHorV ls
-      hvpts = concatMap lineToPts hvls
+  let hvpts = concatMap lineToPts (filter isHorV ls)
   putStrLn "PART 1"
   putStrLn ("Two or more overlaps at " ++
-            show (countCritOverlap hvpts) ++ " points")
+            show (countCritOverlaps hvpts) ++ " points")
   putStrLn "PART 2"
   let hvdpts = concatMap lineToPts ls
   putStrLn ("Two or more overlaps at " ++
-            show (countCritOverlap hvdpts) ++ " points")
+            show (countCritOverlaps hvdpts) ++ " points")

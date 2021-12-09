@@ -3,7 +3,6 @@ module Main where
 
 import Text.Parsec
 import Text.Parsec.String (Parser, parseFromFile)
-import qualified Data.Map.Strict as M
 
 newtype Pool = Pool { unPool :: [Int] }
   deriving (Show, Eq)
