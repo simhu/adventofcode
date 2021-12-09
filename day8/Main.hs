@@ -42,7 +42,7 @@ solve ds = zip [a,b,c,d,e,f,g] maxSeg
         [b] = bd `intersect` cbef
         [d] = delete b bd
         [e] = cde \\ [c,d]
-        [g] = maxSeg \\ [a,b,c,d,e,f]
+        [g] = adg \\ [a,d]
 
 dig :: Seg -> Int
 dig x = case elemIndex x all of
