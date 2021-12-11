@@ -1,52 +1,54 @@
-{-# LANGUAGE TupleSections #-}
 module Main where
 
 import Text.Parsec
 import Text.Parsec.String (Parser, parseFromFile)
-import Data.List
+import Data.List (sortBy)
+import qualified Data.Map.Strict as M
 
-type Grid = [[Int]]
-type Nhd a = (a,a,a,a)
 type Loc = (Int,Int)
+type Grid = M.Map Loc Int
+type PGrid = M.Map Loc Int -- partial grid
+
+annotate :: [[a]] -> [(Loc,a)]
+annotate zss = [ ((x,y),z) | (y,zs) <- zip [0..] zss, (x,z) <- zip [0..] zs ]
 
 grid :: Parser Grid
-grid = many (read . singleton <$> digit) `endBy` newline
+grid = (M.fromList . annotate) <$>
+       many (read . singleton <$> digit) `endBy` newline
   where singleton x = [x]
 
-getNhds :: a -> [[a]] -> [[(a,Nhd a)]]
-getNhds def xss = map row (zip3 xss xssu xssd)
-  where (xssu,xssd) = (repeat def:init xss, tail xss ++ [repeat def])
-        row (xs,xsu,xsd) =
-          zip xs (zip4 xsu xsd (def:init xs) (tail xs ++ [def]))
+getNhd :: Loc -> [Loc]
+getNhd (x,y) = [(x,y-1),(x,y+1),(x-1,y),(x+1,y)]
 
-isLow :: Ord a => a -> Nhd a -> Bool
-isLow x (u,d,l,r) = all (x <) [u,d,l,r]
+(!!!) :: Grid -> Loc -> Int
+(!!!) = flip $ M.findWithDefault 9
 
-getLowVals :: Grid -> [Int]
-getLowVals =
-  map fst . concat . map (filter (uncurry isLow)) . getNhds 10
+lowPoints :: Grid -> PGrid
+lowPoints g = M.filterWithKey (\l v -> all (v <) (map (g !!!) (getNhd l))) g
 
-annotate :: [[a]] -> [[(Loc,a)]]
-annotate g = [[ ((x,y),c) | (x,c) <- zip [0..] cs ] | (y,cs) <- zip [0..] g ]
+connects :: Grid -> PGrid -> PGrid
+connects g marked = marked `M.union` M.fromList new
+  where mark l val = let nh = getNhd l in
+          filter (\(_,v) -> v < 9 && val < v) (zip nh $ map (g !!!) nh)
+        new = M.foldMapWithKey mark (M.intersection g marked)
 
--- State [[Loc]]
+-- The basin associated to a low point.
+growBasin :: Grid -> Loc -> Int -> PGrid
+growBasin g l v = growBasin' g (M.singleton l v)
+  where
+    growBasin' g m = let m' = connects g m in
+      if M.keys m == M.keys m' then m else growBasin' g m'
 
--- type B = State [[Loc]]
-
--- [[Loc]]
-
--- connectsBasin :: Ord a => (Loc,a) -> Nhd (Loc,a) -> B Bool
--- connectsBasin (loc,x) (u,d,l,r) =
---   s <- get
---   any (\(loc',y) -> x < y && loc') [u,d,l,r]
-
-
--- :: (a -> Nhd a -> b) -> [[(a,Nhd a)]] -> [[b]]
--- map (map (uncurry f))
+basins :: Grid -> [PGrid]
+basins g = M.foldMapWithKey (\l v -> [growBasin g l v]) (lowPoints g)
 
 main :: IO ()
 main = do
   Right g <- parseFromFile grid "input"
   putStrLn "PART 1"
-  putStrLn (show (sum (map (+1) (getLowVals g))))
+  let lp = M.elems (lowPoints g)
+  putStrLn (show (length lp + sum lp))
   putStrLn "PART 2"
+  let bs  = basins g
+      bs' = sortBy (flip compare) (map (length . M.keys) bs)
+  putStrLn (show (product (take 3 bs')))
