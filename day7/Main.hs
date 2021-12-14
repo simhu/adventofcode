@@ -22,9 +22,9 @@ main = do
   let (lo, hi) = (minimum cs, maximum cs)
   let dd = map (d cs) [lo..hi]
   putStrLn "PART 1"
-  putStrLn (show (minimum dd))
+  print (minimum dd)
   putStrLn "PART 2"
   let dd' = map (d' cs) [lo..hi]
-  putStrLn (show (minimum dd'))
+  print (minimum dd')
 
 

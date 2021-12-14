@@ -53,10 +53,10 @@ getLooser bss =
 
 main :: IO ()
 main = do
-  let fparser = (,) <$> (num `sepBy1` (char ',')) <* endOfLine <* endOfLine
+  let fparser = (,) <$> (num `sepBy1` char ',') <* endOfLine <* endOfLine
                     <*> board `sepEndBy1` endOfLine
   parseFromFile fparser "input" >>= \case
-    Left err -> putStrLn (show err) >> return ()
+    Left err -> print err
     Right (moves, boards) -> do
       let bss = scanl (flip $ map . mark) boards moves
       putStrLn "PART 1"
@@ -64,7 +64,7 @@ main = do
         Nothing -> error "No game won!"
         Just (i,b)  -> do
           let last = moves !! (i - 1)  -- the scanl also contains boards (no move)
-              usum = sum (concat (map (map (\case { Unmarked n -> n; _ -> 0 })) b))
+              usum = sum (concatMap (map (\case { Unmarked n -> n; _ -> 0 })) b)
           putStrLn ("Last move: " ++ show last)
           putStrLn ("Sum of unmarked elements on winner board: " ++ show usum)
           putStrLn ("Product: " ++ show (last * usum))
@@ -73,7 +73,7 @@ main = do
         Nothing -> error "No clear looser!"
         Just (k,b)  -> do
           let last = moves !! (k - 1)
-              usum = sum (concat (map (map (\case { Unmarked n -> n; _ -> 0 })) b))
+              usum = sum (concatMap (map (\case { Unmarked n -> n; _ -> 0 })) b)
           putStrLn ("Last looser move: " ++ show last)
           putStrLn ("Sum of unmarked elements on looser board: " ++ show usum)
           putStrLn ("Product: " ++ show (last * usum))

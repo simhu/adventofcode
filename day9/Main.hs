@@ -13,7 +13,7 @@ annotate :: [[a]] -> [(Loc,a)]
 annotate zss = [ ((x,y),z) | (y,zs) <- zip [0..] zss, (x,z) <- zip [0..] zs ]
 
 grid :: Parser Grid
-grid = (M.fromList . annotate) <$>
+grid = M.fromList . annotate <$>
        many (read . singleton <$> digit) `endBy` newline
   where singleton x = [x]
 
@@ -24,7 +24,7 @@ getNhd (x,y) = [(x,y-1),(x,y+1),(x-1,y),(x+1,y)]
 (!!!) = flip $ M.findWithDefault 9
 
 lowPoints :: Grid -> PGrid
-lowPoints g = M.filterWithKey (\l v -> all (v <) (map (g !!!) (getNhd l))) g
+lowPoints g = M.filterWithKey (\l v -> all ((v <) . (g !!!)) (getNhd l)) g
 
 connects :: Grid -> PGrid -> PGrid
 connects g marked = marked `M.union` M.fromList new
@@ -47,8 +47,8 @@ main = do
   Right g <- parseFromFile grid "input"
   putStrLn "PART 1"
   let lp = M.elems (lowPoints g)
-  putStrLn (show (length lp + sum lp))
+  print (length lp + sum lp)
   putStrLn "PART 2"
   let bs  = basins g
       bs' = sortBy (flip compare) (map (length . M.keys) bs)
-  putStrLn (show (product (take 3 bs')))
+  print (product (take 3 bs'))

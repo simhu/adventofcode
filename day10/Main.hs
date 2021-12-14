@@ -36,8 +36,6 @@ main :: IO ()
 main = do
   ls <- lines <$> readFile "input"
   let ls' = map check ls
-  putStrLn "PART 1"
-  putStrLn (show (sum (lefts ls')))
-  putStrLn "PART 2"
+  print (sum (lefts ls'))
   let median x = sort x !! (length x `div` 2)
-  putStrLn (show (median (rights ls')))
+  print (median (rights ls'))

@@ -20,7 +20,7 @@ isHorV (Edge (x1,y1) (x2,y2)) = x1 == x2 || y1 == y2
 
 region :: (Ord a, Enum a) => a -> a -> [a]
 region x y | x <= y    = [x..y]
-region x y | otherwise = reverse [y..x]
+           | otherwise = reverse [y..x]
 
 -- like zip, but shorter list gets padded with its last entry
 zip' :: [a] -> [b] -> [(a,b)]
@@ -39,8 +39,7 @@ data N2 = Zero | One | TwoOrMore
   deriving (Eq,Show)
 
 extCount :: [Point] -> M.Map Point N2
-extCount []     = M.empty
-extCount (p:ps) = M.insertWith (\_ _ -> TwoOrMore) p One (extCount ps)
+extCount = foldr (\p -> M.insertWith (\_ _ -> TwoOrMore) p One) M.empty
 
 countCritOverlaps :: [Point] -> Int
 countCritOverlaps =

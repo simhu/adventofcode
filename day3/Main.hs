@@ -3,11 +3,6 @@ module Main where
 import Data.Function
 import Data.List (nub, transpose, maximumBy, nubBy)
 
--- transpose :: [[a]] -> [[a]]
--- transpose [] = []
--- transpose ([]:xss) = []
--- transpose zss = map head zss : transpose (map tail zss)
-
 toInt :: [Bool] -> Int
 toInt xs = toInt' (reverse xs)
   where toInt' [] = 0
@@ -24,16 +19,6 @@ sig = sig' (>=)
 
 sigs :: [[Bool]] -> [Bool]
 sigs = map sig
-
--- -- more general, one could do something like:
--- counts :: (Eq a) => [a] -> [(Int, a)]
--- counts xs = [ (length (filter (==x) xs), x) | x <- nub xs ]
-
--- sig :: Eq a => [a] -> a
--- sig = snd . maximumBy (compare `on` fst) . counts
-
--- sigs :: Eq a => [[a]] -> [a]
--- sigs = map sig
 
 -- works on untransposed list
 rate :: (Int -> Int -> Bool) -> [[Bool]] -> [Bool]

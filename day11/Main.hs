@@ -15,7 +15,7 @@ annotate :: [[a]] -> [(Loc,a)]
 annotate zss = [ ((x,y),z) | (y,zs) <- zip [0..] zss, (x,z) <- zip [0..] zs ]
 
 grid :: Parser Grid
-grid = (M.fromList . annotate) <$>
+grid = M.fromList . annotate <$>
        many (read . singleton <$> digit) `endBy` newline
   where singleton x = [x]
 
@@ -38,8 +38,8 @@ main = do
   Right g <- parseFromFile grid "input"
   -- Part 1
   let it100 = foldM (const . step) g [0..99]
-  putStrLn (show (getSum (execWriter it100)))
+  print (getSum (execWriter it100))
   -- Part 2
   let iter = iterate (fst . runWriter . step) g
   let Just n = findIndex (all ((==0) . snd) . M.assocs) iter
-  putStrLn (show n)
+  print n

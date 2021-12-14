@@ -16,7 +16,7 @@ rules = ((,) <$> ((,) <$> letter <*> letter) <*> (string " -> " *> letter))
 
 countList :: Eq a => [a] -> [(a,Int)]
 countList []     = []
-countList (x:xs) = (x, length eqx + 1):(countList neqx)
+countList (x:xs) = (x, length eqx + 1):countList neqx
  where (eqx,neqx) = partition (==x) xs
 
 toCounts :: Template -> Counts
@@ -36,5 +36,5 @@ main = do
   Right (t,rs) <- parseFromFile p "input"
   let answ x = last ns - head ns
         where ns = sort $ map snd $ counts $ iterate (step rs) (toCounts t) !! x
-  putStrLn (show $ answ 10)
-  putStrLn (show $ answ 40)
+  print $ answ 10
+  print $ answ 40

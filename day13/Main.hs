@@ -23,7 +23,7 @@ folds = (string "fold along " *>
 
 fold :: Transparent -> Fold -> Transparent
 fold m (X x) = -- NB: assumption colum x is empty in m
-  let (left,right') = (S.partition (\(i,_) -> i < x) m)
+  let (left,right') = S.partition (\(i,_) -> i < x) m
       right = S.map (\(i,j) -> (2 * x - i, j)) right'
   in S.union left right
 fold m (Y y) = swap (fold (swap m) (X y))
@@ -39,5 +39,5 @@ main :: IO ()
 main = do
   Right (t,fs) <- parseFromFile ((,) <$> trans <*> (newline *> folds)) "input"
   let f1 = head fs
-  putStrLn (show $ length (S.elems $ fold t f1))
+  print $ length (S.elems $ fold t f1)
   putStrLn (showTransparent $ foldl fold t fs)

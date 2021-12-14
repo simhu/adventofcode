@@ -24,10 +24,8 @@ alive = sum . unPool
 main :: IO ()
 main = do
   Right s <- parseFromFile sea "input"
-  putStrLn "PART 1"
-  putStrLn (show (alive ((iterate evolve (fromSea s)) !! 80)))
-
-  putStrLn "PART 2"
-  putStrLn (show (alive ((iterate evolve (fromSea s)) !! 256)))
+  let solve x = alive (iterate evolve (fromSea s) !! x)
+  print (solve 80)
+  print (solve 256)
 
 

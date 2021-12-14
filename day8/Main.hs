@@ -66,7 +66,7 @@ main = do
   let outs = map snd dos
   putStrLn "PART 1"
   let part1 = length (filter (\s -> length s `elem` [2,3,4,7]) (concat outs))
-  putStrLn (show part1)
+  print part1
   putStrLn "PART 2"
   let part2 = sum $ map (\(d,o) -> display (solve d) o) dos
-  putStrLn (show part2)
+  print part2

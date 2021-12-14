@@ -62,11 +62,8 @@ allPaths2 g s e = concatMap (\v -> go [] [] v s) (Nothing:map Just (small $ M.ke
 main :: IO ()
 main = do
   Right es <- parseFromFile graph "input"
-  -- putStrLn (show es)
   let ap = allPaths es Start End
-
-  putStrLn (show (length ap))
+  print (length ap)
   let ap2 = allPaths2 es Start End
-  -- putStrLn (unlines (map show ap2))
-  putStrLn (show (length ap2))
+  print (length ap2)
 
