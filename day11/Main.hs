@@ -19,7 +19,6 @@ grid = (M.fromList . annotate) <$>
        many (read . singleton <$> digit) `endBy` newline
   where singleton x = [x]
 
--- flash :: Grid -> PGrid -> PGrid
 adj :: Loc -> [Loc]
 adj (x,y) = delete (x,y) [ (x+dx,y+dy) | dx <- [-1,0,1], dy <- [-1,0,1] ]
 

@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
 module Main where
 
 import Data.List (sort)
@@ -30,7 +29,7 @@ check xs = go xs []
                            go xs (fromJust (lookup x matching) : ys)
         go (x:xs) (y:ys) | x == y        = go xs ys
 
-        go (x:xs) (y:ys) | otherwise     = Left (val x) -- corrupt
+        go (x:xs) (y:ys) | otherwise     = Left (val x)               -- corrupt
         go []     ys                     = Right (score (reverse ys)) -- incomplete
 
 main :: IO ()

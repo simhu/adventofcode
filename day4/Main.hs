@@ -3,7 +3,7 @@ module Main where
 
 import Text.Parsec hiding (State)
 import Text.Parsec.String (Parser, parseFromFile)
-import Data.List (findIndex, transpose)
+import Data.List (findIndex, find, transpose)
 import Data.Maybe (mapMaybe, listToMaybe)
 
 -- TODO: cleanup?
@@ -23,7 +23,7 @@ cell = Unmarked <$> num
 board :: Parser Board
 -- NB: Can't use 'spaces' instead of the 'many (char ' ')' as '\n'
 -- also parsed by spaces..
-board = many1 (many (char ' ') >> cell) `endBy1` endOfLine
+board = many1 (many (char ' ') *> cell) `endBy1` endOfLine
 
 isMarked :: Cell -> Bool
 isMarked (Marked _) = True
@@ -35,14 +35,13 @@ isWinner b = any (all isMarked) b || any (all isMarked) (transpose b)
 mark :: Move -> Board -> Board
 mark m = map (map (\case { Unmarked x | x == m -> Marked x; z -> z }))
 
--- a bit ugly, but oh..
 getMarked :: [[Board]] -> Maybe (Int, Board)
-getMarked bss = do i <- findIndex (any isWinner) bss
-                   let bs = bss !! i
-                   j <- findIndex isWinner bs
-                   return (i, bs !! j)
+getMarked [] = Nothing
+getMarked (bs:bss)
+ | Just b <- find isWinner bs = return (0, b)
+ | otherwise                  = do (i,b) <- getMarked bss
+                                   return (i+1,b)
 
--- even uglier?
 getLooser :: [[Board]] -> Maybe (Int, Board)
 getLooser bss =
   do i <- findIndex (\bs -> length (filter (not . isWinner) bs) == 1) bss
