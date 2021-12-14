@@ -1,0 +1,1 @@
+:set -package parsec -package mtl -package containers
