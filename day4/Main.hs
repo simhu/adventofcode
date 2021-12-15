@@ -21,8 +21,6 @@ cell :: Parser Cell
 cell = Unmarked <$> num
 
 board :: Parser Board
--- NB: Can't use 'spaces' instead of the 'many (char ' ')' as '\n'
--- also parsed by spaces..
 board = many1 (many (char ' ') *> cell) `endBy1` endOfLine
 
 isMarked :: Cell -> Bool

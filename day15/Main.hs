@@ -7,7 +7,6 @@ import Data.Map (Map, (!), (!?))
 import qualified Data.Map as M
 import Data.Set (Set)
 import qualified Data.Set as S
-import Data.Function (on)
 import qualified Data.PSQueue as P
 import Data.PSQueue (PSQ, Binding(..))
 
