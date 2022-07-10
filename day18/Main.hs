@@ -15,7 +15,7 @@ type Snail = Tree Int
 
 data Dir = L | R
   deriving (Show,Eq)
--- A path (i.e, position) in a tree
+-- A path (i.e., position) in a tree
 type Path = [Dir]
 
 expPath :: Snail -> Maybe ((Int,Int), Path)
