@@ -25,9 +25,9 @@ expPath x = go x 4
         go (Branch l r) n = fmap (L:) <$> go l (n-1) <|> fmap (R:) <$> go r (n-1)
 
 updLeft, updRight :: Snail -> Int -> Snail
-updLeft  (Leaf n) m     = Leaf (n+m)
+updLeft  (Leaf n)     m = Leaf (n+m)
 updLeft  (Branch l r) m = Branch (updLeft l m) r
-updRight (Leaf n) m     = Leaf (n+m)
+updRight (Leaf n)     m = Leaf (n+m)
 updRight (Branch l r) m = Branch l (updRight r m)
 
 explode' :: Snail -> Path -> Int -> Int -> Snail
@@ -43,19 +43,12 @@ explode :: Snail -> Maybe Snail
 explode x = do ((lv,rv), p) <- expPath x
                return $ explode' x p lv rv
 
-splitPath :: Snail -> Maybe Path
-splitPath (Leaf n) | n >= 10 = Just []
-splitPath (Leaf _)           = Nothing
-splitPath (Branch l r)       = (L:) <$> splitPath l <|> (R:) <$> splitPath r
-
-splitWithPath :: Snail -> Path -> Snail
-splitWithPath (Leaf n) [] =
-  Branch (Leaf $ n `div` 2) (Leaf $ n `div` 2 + n `mod` 2)
-splitWithPath (Branch l r) (L:xs) = Branch (splitWithPath l xs) r
-splitWithPath (Branch l r) (R:xs) = Branch l (splitWithPath r xs)
-
 split :: Snail -> Maybe Snail
-split x = splitWithPath x <$> splitPath x
+split (Leaf n) | n >= 10 =
+  Just $ Branch (Leaf $ n `div` 2) (Leaf $ n `div` 2 + n `mod` 2)
+split (Leaf _)           = Nothing
+split (Branch l r)       =
+  Branch <$> split l <*> pure r <|> Branch l <$> split r
 
 iterMaybe :: (a -> Maybe a) -> a -> a
 iterMaybe f x = case f x of
