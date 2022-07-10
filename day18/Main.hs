@@ -15,7 +15,6 @@ type Snail = Tree Int
 
 data Dir = L | R
   deriving (Show,Eq)
--- A path (i.e., position) in a tree
 type Path = [Dir]
 
 expPath :: Snail -> Maybe ((Int,Int), Path)
@@ -80,8 +79,8 @@ snail =  Leaf <$> num
 
 maxMagnitudePair :: [Snail] -> Int
 maxMagnitudePair []     = -1
-maxMagnitudePair (x:xs) =
-  maximum $ maxMagnitudePair xs:[magnitude (add x y) | y <- xs]
+maxMagnitudePair (x:xs) = maximum $ maxMagnitudePair xs:
+    [ max (magnitude (add x y)) (magnitude (add y x)) | y <- xs]
 
 main :: IO ()
 main = do
